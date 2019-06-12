@@ -10,9 +10,11 @@ from scipy.constants import G
 
 class Body(object):
     def __init__(self, pos, mass):
-        self.pos = pos
         self.mass = mass
         self.rad = log10(mass)
+
+        self.pos = pos
+        self.vel = np.zeros(2)
         self.acc = np.zeros(2)
 
     def get_artist(self, ax):
@@ -31,6 +33,9 @@ class Body(object):
             acc += G * (self.mass+body.mass) / (self.rad*body.rad)
         self.acc = acc
 
+    def move(self, dt):
+        self.vel = self.acc * dt
+        self.pos = self.vel * dt
 
 
 
