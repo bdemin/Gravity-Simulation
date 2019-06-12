@@ -20,7 +20,11 @@ class Body(object):
         return self.artist
 
     def collision_check(self, body):
-        pass
+        vector_len = np.abs(self.pos - body.pos)
+        if vector_len <= self.rad + body.rad:
+            return True
+        return False
+
 
 
 # Define figure and axes:
