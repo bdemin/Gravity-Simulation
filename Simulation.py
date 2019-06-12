@@ -25,6 +25,14 @@ class Body(object):
             return True
         return False
 
+    def calc_acc(self, bodies):
+        acc = 0
+        for body in bodies:
+            acc += G * (self.mass+body.mass) / (self.rad*body.rad)
+        self.acc = acc
+
+
+
 
 
 # Define figure and axes:
