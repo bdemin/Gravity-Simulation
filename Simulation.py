@@ -14,12 +14,12 @@ def get_dirvec(vec1, vec2):
 
 
 class Body(object):
-    def __init__(self, pos, mass):
+    def __init__(self, pos, mass, vel):
         self.mass = mass
         self.rad = log10(mass)
 
         self.pos = pos
-        self.vel = np.zeros(2)
+        self.vel = vel
         self.acc = np.zeros(2)
 
     def get_artist(self, ax):
@@ -58,12 +58,15 @@ fig1, ax1 = plt.subplots()
 num_bodies = 5
 bodies = []
 size = 1000
+max_vel = 100
 for i in range(num_bodies):
     pos = np.array((float(np.random.randint(0, size)), 
                     float(np.random.randint(0, size))))
     mass = 10 ** np.random.randint(10, 20)
-    bodies.append(Body(pos, mass))
-star = Body((size/2, size/2), 1e30)
+    vel = np.array((float(np.random.randint(0, max_vel)), 
+                    float(np.random.randint(0, max_vel))))
+    bodies.append(Body(pos, mass, vel))
+star = Body((size/2, size/2), 1e30, np.zeros(2))
 bodies.append(star)
 
 
@@ -82,7 +85,7 @@ def init():
 def animate(frame):
     artists = []
     for body in bodies:
-        body.calc_acc(bodies)
+        # body.calc_acc(bodies)
         body.move(dt)
         body.bounce()
         artists.append(body.get_artist(ax1))
