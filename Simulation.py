@@ -43,24 +43,32 @@ class Body(object):
         self.vel += self.acc * dt
         self.pos += self.vel * dt
 
+    def bounce(self):
+        if self.pos[0] <= 0 or self.pos[0] >= size:
+            self.vel[0] *= -1
+        elif self.pos[1] <= 0 or self.pos[1] >= size:
+            self.vel[1] *= -1
+
 
 
 # Define figure and axes:
 fig1, ax1 = plt.subplots()
 
 
-num_bodies = 10
+num_bodies = 5
 bodies = []
 size = 1000
 for i in range(num_bodies):
     pos = np.array((float(np.random.randint(0, size)), 
                     float(np.random.randint(0, size))))
-    mass = 10 ** np.random.randint(1, 30)
+    mass = 10 ** np.random.randint(10, 20)
     bodies.append(Body(pos, mass))
+star = Body((size/2, size/2), 1e30)
+bodies.append(star)
 
 
 T = 60
-FPS = 48
+FPS = 60
 num_frames = T*FPS
 dt = (1/FPS)
 
@@ -76,6 +84,7 @@ def animate(frame):
     for body in bodies:
         body.calc_acc(bodies)
         body.move(dt)
+        body.bounce()
         artists.append(body.get_artist(ax1))
 
 
