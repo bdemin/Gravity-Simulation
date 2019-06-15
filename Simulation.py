@@ -67,9 +67,10 @@ bodies = []
 size = 150e6 #[Km]
 max_vel = 100000
 
-# star = Body((size/2, size/2), 1.989e30, np.zeros(2))
-# bodies.append(star)
+star = Body((size/2, size/2), 1.989e30, np.zeros(2))
+bodies.append(star)
 
+np.random.seed(5)
 for i in range(num_bodies):
     pos = np.array((float(np.random.randint(0, size)), 
                     float(np.random.randint(0, size))))
