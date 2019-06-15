@@ -36,18 +36,16 @@ class Body(object):
 
     def calc_force(self, body):
         dist = np.linalg.norm(self.pos - body.pos)
-        self.force += -(G * self.mass * body.mass)/(dist**2) * get_dirvec(self.pos, body.pos)
+        self.force += ((G * self.mass * body.mass)/(dist**2)) * get_dirvec(self.pos, body.pos)
+
 
     def calc_acc(self, body):
         dist = np.linalg.norm(self.pos - body.pos)
         self.acc += -G * (body.mass/(dist**2)) * get_dirvec(self.pos, body.pos)
 
     def move(self, dt):
-        try:
-            self.vel += self.acc * dt
-            self.pos += self.vel * dt
-        except:
-            print('wtf')
+        self.vel += self.acc * dt
+        self.pos += self.vel * dt
 
     def bounce(self):
         if self.pos[0] <= 0 or self.pos[0] >= size:
@@ -55,25 +53,30 @@ class Body(object):
         elif self.pos[1] <= 0 or self.pos[1] >= size:
             self.vel[1] *= -1
 
+
+    def consume(self, body, bodies):
+        self.mass += body.mass
+        self.rad = log10(self.mass) * 1e5
+        bodies.remove(body)
+
 # Define figure and axes:
 fig1, ax1 = plt.subplots()
 
-
-num_bodies = 10
+num_bodies = 40
 bodies = []
 size = 150e6 #[Km]
-max_vel = 100
+max_vel = 100000
 
-star = Body((size/2, size/2), 1.989e30, np.zeros(2))
-bodies.append(star)
+# star = Body((size/2, size/2), 1.989e30, np.zeros(2))
+# bodies.append(star)
 
 for i in range(num_bodies):
     pos = np.array((float(np.random.randint(0, size)), 
                     float(np.random.randint(0, size))))
-    mass = 10 ** np.random.randint(10, 30)
+    mass = float(10 ** np.random.randint(2, 20))
     vel = np.array((float(np.random.randint(0, max_vel)), 
                     float(np.random.randint(0, max_vel))))
-    bodies.append(Body(pos, mass, vel))
+    bodies.append(Body(pos, mass, vel=np.zeros(2)))
 
 # bodies.append(Body((size/2 + 300, size/2 + 300), 1e20, np.zeros(2)))
 
@@ -97,16 +100,21 @@ def animate(frame):
         if body1.mass < 1e30:
             for body2 in bodies:
                 if body1 is not body2:
-                    body1.calc_force(body2)
-                    # body1.calc_acc(body2)
-                    
-
+                    if not body1.collision_check(body2):
+                        body1.calc_force(body2)
+                    else:
+                        if body1.mass > body2.mass:
+                            body1.consume(body2, bodies)
+                        else:
+                            body2.consume(body1, bodies)
+                        # break
+            # else:        
             body1.acc =  body1.force / body1.mass
             body1.move(dt)
             body1.bounce()
         artists.append(body1.get_artist(ax1))
-        body1.acc = np.zeros(2)
-
+        # body1.acc = np.zeros(2)
+        body1.force = np.zeros(2)
 
 
     return artists
